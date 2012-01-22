@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2012 Valentin Kolesnikov
+ * Copyright 2012 Valentyn Kolesnikov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,13 +45,41 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class SearchFileByTemplate extends javax.swing.JFrame {
+    private final class TemplateFilenameFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            File file = new File(dir + "/" + name);
+            boolean nameCheck = name.toLowerCase().matches(
+                    jTextField2.getText().toLowerCase()
+                        .replaceAll("\\.", "\\.").replaceAll("\\?", ".")
+                        .replaceAll("\\*", ".*?")
+                    );
+            long fileLength = file.length();
+            boolean minCheck = true;
+            if (jCheckBox2.isSelected() && jTextField4.getText().matches("\\d+")) {
+                minCheck = fileLength >= Integer.valueOf(jTextField4.getText());
+            }
+            boolean maxCheck = true;
+            if (jCheckBox1.isSelected() && jTextField5.getText().matches("\\d+")) {
+                maxCheck = fileLength <= Integer.valueOf(jTextField5.getText());
+            }
+            boolean equalCheck = true;
+            if (jCheckBox3.isSelected() && jTextField6.getText().matches("\\d+")) {
+                equalCheck = fileLength == Integer.valueOf(jTextField6.getText());
+            }
+            boolean systemCheck = true;
+            if (jCheckBox6.isSelected()) {
+                systemCheck = !file.canWrite();
+            }
+            return file.isDirectory() || (nameCheck && minCheck && maxCheck && equalCheck && systemCheck);
+        }
+    }
     private static final int BUFFER_SIZE = 100000;
-    
+
     private List<DefaultListModel> models = new ArrayList<DefaultListModel>();
     private Date timeStart;
     private Thread searchThread;
-    
-    /** Creates new form Find */
+
+    /** Creates new form Find. */
     public SearchFileByTemplate() {
         setLookAndFeel();
         initComponents();
@@ -79,16 +107,16 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
             ex.getMessage();
         }
     }
-    
+
     private static void setLookAndFeel() {
-        javax.swing.UIManager.LookAndFeelInfo infos[] = UIManager.getInstalledLookAndFeels();
+        javax.swing.UIManager.LookAndFeelInfo[] infos = UIManager.getInstalledLookAndFeels();
         String firstFoundClass = null;
-        javax.swing.UIManager.LookAndFeelInfo arr$[] = infos;
-        int len$ = arr$.length;
-        for (int i$ = 0; i$ < len$; i$++) {
-            javax.swing.UIManager.LookAndFeelInfo info = arr$[i$];
+        javax.swing.UIManager.LookAndFeelInfo[] arr = infos;
+        int len = arr.length;
+        for (int index = 0; index < len; index++) {
+            javax.swing.UIManager.LookAndFeelInfo info = arr[index];
             String foundClass = info.getClassName();
-            if("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel".equals(foundClass)) {
+            if ("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel".equals(foundClass)) {
                 firstFoundClass = foundClass;
                 break;
             }
@@ -114,7 +142,7 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
             return;
         }
     }
-   
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -546,7 +574,7 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         System.exit(0);
     }//GEN-LAST:event_jButton2ActionPerformed
-    
+
     private void writeDataFile(File file) {
         Writer writer = null;
         try {
@@ -572,36 +600,10 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
         }
     }
     private void findFiles(File dir) {
-        File[] files = dir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                File file = new File(dir + "/" + name);
-                boolean nameCheck = name.toLowerCase().matches(
-                        jTextField2.getText().toLowerCase()
-                            .replaceAll("\\.", "\\.").replaceAll("\\?", ".")
-                            .replaceAll("\\*", ".*?")
-                        );
-                long fileLength = file.length();
-                boolean minCheck = true;
-                if (jCheckBox2.isSelected() && jTextField4.getText().matches("\\d+")) {
-                    minCheck = fileLength >= Integer.valueOf(jTextField4.getText());
-                }
-                boolean maxCheck = true;
-                if (jCheckBox1.isSelected() && jTextField5.getText().matches("\\d+")) {
-                    maxCheck = fileLength <= Integer.valueOf(jTextField5.getText());
-                }
-                boolean equalCheck = true;
-                if (jCheckBox3.isSelected() && jTextField6.getText().matches("\\d+")) {
-                    equalCheck = fileLength == Integer.valueOf(jTextField6.getText());
-                }
-                boolean systemCheck = true;
-                if (jCheckBox6.isSelected()) {
-                    systemCheck = !file.canWrite();
-                }
-                return file.isDirectory() || (nameCheck && minCheck && maxCheck && equalCheck && systemCheck);
-            }
-        });
+        File[] files = dir.listFiles(new TemplateFilenameFilter());
         if (files == null) {
-            Logger.getLogger(SearchFileByTemplate.class.getName()).log(Level.SEVERE, "Can't read " + dir.getAbsolutePath());
+            Logger.getLogger(SearchFileByTemplate.class.getName()).log(
+                    Level.SEVERE, "Can't read " + dir.getAbsolutePath());
             return;
         }
         for (final File file : files) {
@@ -614,7 +616,7 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
                         public void run() {
                             models.get(models.size() - 1).add(0, file.getAbsolutePath());
                         }
-                    });                    
+                    });
                     jLabel5.setText(String.valueOf(
                             Integer.valueOf(jLabel5.getText()) + 1));
                 }
@@ -623,9 +625,9 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
                     findFiles(file);
                 }
             }
-        }        
+        }
     }
-    
+
     private boolean searchText(File file) {
         jLabel9.setText(file.getAbsolutePath());
         long timeDiff = new Date().getTime() - timeStart.getTime();
@@ -663,16 +665,17 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
     }
 
     /**
+     * main.
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SearchFileByTemplate().setVisible(true);
             }
         });
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -704,5 +707,5 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
-    
+
 }
