@@ -111,10 +111,7 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
     private static void setLookAndFeel() {
         javax.swing.UIManager.LookAndFeelInfo[] infos = UIManager.getInstalledLookAndFeels();
         String firstFoundClass = null;
-        javax.swing.UIManager.LookAndFeelInfo[] arr = infos;
-        int len = arr.length;
-        for (int index = 0; index < len; index++) {
-            javax.swing.UIManager.LookAndFeelInfo info = arr[index];
+        for (javax.swing.UIManager.LookAndFeelInfo info : infos) {
             String foundClass = info.getClassName();
             if ("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel".equals(foundClass)) {
                 firstFoundClass = foundClass;
