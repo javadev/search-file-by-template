@@ -189,6 +189,9 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
             }
         });
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 jTextField1KeyTyped(evt);
             }
@@ -537,7 +540,7 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
-        jButton1.setEnabled(!((JTextField) evt.getSource()).getText().isEmpty());
+        
     }//GEN-LAST:event_jTextField1KeyTyped
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -571,6 +574,10 @@ public class SearchFileByTemplate extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         System.exit(0);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        jButton1.setEnabled(!((JTextField) evt.getSource()).getText().isEmpty());
+    }//GEN-LAST:event_jTextField1KeyReleased
 
     private void writeDataFile(File file) {
         Writer writer = null;
