@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>com.github</groupId>
-  <artifactId>searchfilebytemplate</artifactId>
+  <artifactId>search-file-by-template</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>Search file by template</name>
